@@ -24,6 +24,7 @@ const schema = buildSchema(`
     date: DateTime
     url: String
     content: String
+    video: String
   }
 `);
 
@@ -33,21 +34,24 @@ const notes = [
     title: "test 1",
     date: "2020-01-01",
     url: "http://www.test1url.com",
-    content: "TODO test 1"
+    content: "TODO test 1",
+    video: "http://www.youtube.com/watch?v=test1"
   },
   {
     id: 2,
     title: "test 2",
     date: "2020-02-02",
     url: "http://www.test2url.com",
-    content: "TODO test 2"
+    content: "TODO test 2",
+    video: "http://www.youtube.com/watch?v=test2"
   },
   {
     id: 3,
     title: "test 3",
     date: "2020-02-02",
     url: "http://www.test3url.com",
-    content: "TODO test 3"
+    content: "TODO test 3",
+    video: "http://www.youtube.com/watch?v=test3"
   },
 ]
 
