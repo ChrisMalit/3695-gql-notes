@@ -1,9 +1,18 @@
 const express = require('express');
 const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
+const { GraphQLDateTime } = require('graphql-iso-date')
+
+// Resolvers
+const resolvers = {
+  /* your other resolvers */
+  DateTime: GraphQLDateTime,
+}
 
 // Construct a schema, using GraphQL schema language
 const schema = buildSchema(`
+  scalar DateTime
+
   type Query {
     readNote(id: Int!): Note
     queryNotes: [Note]
@@ -12,6 +21,7 @@ const schema = buildSchema(`
   type Note{
     id: Int
     title: String
+    date: DateTime
     url: String
     content: String
   }
@@ -21,18 +31,21 @@ const notes = [
   {
     id: 1,
     title: "test 1",
+    date: "2020-01-01",
     url: "http://www.test1url.com",
     content: "TODO test 1"
   },
   {
     id: 2,
     title: "test 2",
+    date: "2020-02-02",
     url: "http://www.test2url.com",
     content: "TODO test 2"
   },
   {
     id: 3,
     title: "test 3",
+    date: "2020-02-02",
     url: "http://www.test3url.com",
     content: "TODO test 3"
   },
