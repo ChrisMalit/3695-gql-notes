@@ -3,6 +3,7 @@ const { graphqlHTTP } = require('express-graphql');
 const { buildSchema } = require('graphql');
 const { GraphQLDateTime } = require('graphql-iso-date')
 
+
 // Resolvers
 const resolvers = {
   /* your other resolvers */
@@ -12,6 +13,7 @@ const resolvers = {
 // Construct a schema, using GraphQL schema language
 const schema = buildSchema(`
   scalar DateTime
+  scalar VideoCategory
 
   type Query {
     readNote(id: Int!): Note
@@ -24,7 +26,7 @@ const schema = buildSchema(`
     date: DateTime
     url: String
     content: String
-    video: String
+    video: VideoCategory
   }
 `);
 
@@ -35,7 +37,7 @@ const notes = [
     date: "2020-01-01",
     url: "http://www.test1url.com",
     content: "TODO test 1",
-    video: "http://www.youtube.com/watch?v=test1"
+    video: "TO BE FIXED"
   },
   {
     id: 2,
@@ -43,7 +45,7 @@ const notes = [
     date: "2020-02-02",
     url: "http://www.test2url.com",
     content: "TODO test 2",
-    video: "http://www.youtube.com/watch?v=test2"
+    video: "TO BE FIXED"
   },
   {
     id: 3,
@@ -51,7 +53,7 @@ const notes = [
     date: "2020-02-02",
     url: "http://www.test3url.com",
     content: "TODO test 3",
-    video: "http://www.youtube.com/watch?v=test3"
+    video: "TO BE FIXED"
   },
 ]
 
