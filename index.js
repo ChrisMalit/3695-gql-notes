@@ -13,7 +13,11 @@ const resolvers = {
 // Construct a schema, using GraphQL schema language
 const schema = buildSchema(`
   scalar DateTime
-  scalar VideoCategory
+  enum VideoCategory {
+    LIVE_RECORD
+    YOUTUBE
+    DEVICE
+  }
 
   type Query {
     readNote(id: Int!): Note
@@ -37,7 +41,7 @@ const notes = [
     date: "2020-01-01",
     url: "http://www.test1url.com",
     content: "TODO test 1",
-    video: "TO BE FIXED"
+    video: "LIVE_RECORD"
   },
   {
     id: 2,
@@ -45,7 +49,7 @@ const notes = [
     date: "2020-02-02",
     url: "http://www.test2url.com",
     content: "TODO test 2",
-    video: "TO BE FIXED"
+    video: "YOUTUBE"
   },
   {
     id: 3,
@@ -53,7 +57,7 @@ const notes = [
     date: "2020-02-02",
     url: "http://www.test3url.com",
     content: "TODO test 3",
-    video: "TO BE FIXED"
+    video: "YOUTUBE"
   },
 ]
 
@@ -62,6 +66,7 @@ const root = {
   readNote: ({ id }) => {
     return notes.find(notes => notes.id == id);
   },
+
   queryNotes: () => {
     return notes;
   }
