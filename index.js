@@ -1,83 +1,129 @@
-const express = require('express');
-const { graphqlHTTP } = require('express-graphql');
-const { buildSchema } = require('graphql');
-const { GraphQLDateTime } = require('graphql-iso-date')
+const { GraphQLServer } = require('graphql-yoga')
+const mongoose = require('mongoose');
+const cron = require('node-cron');
+const moment = require('moment');
+var cloudinary = require('cloudinary').v2;
+
+mongoose.connect('mongodb+srv://admin:P@ssw0rd@cluster0.zo5ak.mongodb.net/<dbname>?retryWrites=true&w=majority', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+mongoose.set('useFindAndModify', false);
+
+cloudinary.config({
+    cloud_name: 'xxxxx',
+    api_key: 'xxxxx',
+    api_secret: 'xxxxx'
+});
 
 
-// Resolvers
-const resolvers = {
-  /* your other resolvers */
-  DateTime: GraphQLDateTime,
-}
 
-// Construct a schema, using GraphQL schema language
-const schema = buildSchema(`
-  scalar DateTime
+const Note = mongoose.model("Note", {
+    title: String,
+    date: String,
+    url: String,
+    content: String,
+    video: String,
+    reminder: String,
+    Image: String
+});
+
+const Upcoming = mongoose.model("Upcoming", {
+    title: String,
+    date: String,
+    url: String,
+    content: String,
+    video: String,
+    reminder: String,
+    Image: String
+});
+
+const typeDefs = 
+`type Query {
+    getNote(id: ID!): Note
+    getNotes: [Note]
+    getNoteByTitle(title: String!): [Note]
+    getUpcoming: [Upcoming]
+  }
+
   enum VideoCategory {
     LIVE_RECORD
     YOUTUBE
     DEVICE
   }
 
-  type Query {
-    readNote(id: Int!): Note
-    queryNotes: [Note]
+  type Note {
+    id:ID!
+    title: String!
+    date: String!
+    url: String!
+    content: String!
+    video: VideoCategory!
+    reminder: String!
+    Image: String
   }
 
-  type Note{
-    id: Int
-    title: String
-    date: DateTime
-    url: String
-    content: String
-    video: VideoCategory
+  type Upcoming {
+    id:ID!
+    title: String!
+    date: String!
+    url: String!
+    content: String!
+    video: VideoCategory!
+    reminder: String!
+    Image: String
   }
-`);
 
-const notes = [
-  {
-    id: 1,
-    title: "test 1",
-    date: "2020-01-01",
-    url: "http://www.test1url.com",
-    content: "TODO test 1",
-    video: "LIVE_RECORD"
-  },
-  {
-    id: 2,
-    title: "test 2",
-    date: "2020-02-02",
-    url: "http://www.test2url.com",
-    content: "TODO test 2",
-    video: "YOUTUBE"
-  },
-  {
-    id: 3,
-    title: "test 3",
-    date: "2020-02-02",
-    url: "http://www.test3url.com",
-    content: "TODO test 3",
-    video: "YOUTUBE"
-  },
-]
+  type Mutation {
+      addNote(title: String!, date: String!, url: String!, content: String!, video:VideoCategory!, reminder:String!, Image:String): Note!,
+      deleteNote(id: ID!): String,
+      addImage(id: ID!, Image: String!): String
+  }`
 
-// The root provides a resolver function for each API endpoint
-const root = {
-  readNote: ({ id }) => {
-    return notes.find(notes => notes.id == id);
-  },
+const resolvers = {
+    Query: {
+        getNotes: () => Note.find(),
+        getNote: async (_, { id }) => {
+            var result = await Note.findById(id);
+            return result;
+        },
+        getNoteByTitle: async (_, { title }) => {
+            allNotes = await Note.find();
+            var notes = allNotes.filter(b => b.title == title);
+            return notes;
+        },
+        getUpcoming: () => Upcoming.find()
+    },
 
-  queryNotes: () => {
-    return notes;
-  }
-};
+    Mutation: {
+        addNote: async (_, { title, date, url, content, video, reminder, Image }) => {
+            const note = new Note({ title, date, url, content, video, reminder, Image });
+            await note.save();
+            const imagePath = Image;
+            if (imagePath !== null) {
+                cloudinary.uploader.upload(imagePath, { tags: 'note taking app', public_id: title + Image });
+            };
+            return note;
+        },
+        deleteNote: async (_, { id }) => {
+            await Note.findByIdAndRemove(id);
+            return "Note deleted";
+        },
+        addImage: async (_, { id, Image }) => {
+            await Note.findByIdAndUpdate(id, { Image: Image });
+            cloudinary.uploader.upload(Image, { tags: 'note taking app', public_id: id + Image });
+            return "Added Image";
+        }
+    }
+}
 
-const app = express();
+cron.schedule('*/2 * * * * *', () => {
+    let time = moment()
+    const result = Note.filter( calEvent => calEvent.date == time.add(1, 'd').format("YYYY-MM-DD"))
+    console.log(result)
+})
 
-app.use('/graphql', graphqlHTTP({
-  schema: schema,
-  rootValue: root,
-  graphiql: true,
-}));
-app.listen(4000);
-console.log('Running a GraphQL API server at http://localhost:4000/graphql');
+const server = new GraphQLServer({ typeDefs, resolvers })
+mongoose.connection.once("open", function () {
+    server.start(() => console.log('Server is running on localhost:4000'))
+});

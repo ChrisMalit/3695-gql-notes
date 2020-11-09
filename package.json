@@ -1,26 +1,19 @@
 {
-  "name": "3695-gql-notes",
+  "name": "todoapp_api",
   "version": "1.0.0",
-  "description": "acit3695",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ChrisMalit/3695-gql-notes.git"
-  },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/ChrisMalit/3695-gql-notes/issues"
-  },
-  "homepage": "https://github.com/ChrisMalit/3695-gql-notes#readme",
   "dependencies": {
-    "express": "^4.17.1",
-    "express-graphql": "^0.11.0",
-    "graphql": "^15.3.0",
-    "graphql-iso-date": "^3.6.1"
+    "cloudinary": "^1.23.0",
+    "graphql-yoga": "^1.18.3",
+    "moment": "^2.29.1",
+    "mongoose": "^5.10.9",
+    "node-cron": "^2.0.3"
   }
 }
