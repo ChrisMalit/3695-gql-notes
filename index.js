@@ -8,6 +8,9 @@ mongoose.connect('mongodb+srv://admin:P@ssw0rd@cluster0.zo5ak.mongodb.net/<dbnam
     useNewUrlParser: true,
     useUnifiedTopology: true
 });
+
+var mongooseConnect = mongoose.connection;
+
 mongoose.set('useFindAndModify', false);
 
 cloudinary.config({
@@ -83,6 +86,7 @@ const typeDefs =
 const resolvers = {
     Query: {
         getNotes: () => Note.find(),
+        getUpcoming: () => Upcoming.find(),
         getNote: async (_, { id }) => {
             var result = await Note.findById(id);
             return result;
@@ -91,8 +95,7 @@ const resolvers = {
             allNotes = await Note.find();
             var notes = allNotes.filter(b => b.title == title);
             return notes;
-        },
-        getUpcoming: () => Upcoming.find()
+        }
     },
 
     Mutation: {
@@ -117,10 +120,21 @@ const resolvers = {
     }
 }
 
-cron.schedule('*/2 * * * * *', () => {
-    let time = moment()
-    const result = Note.filter( calEvent => calEvent.date == time.add(1, 'd').format("YYYY-MM-DD"))
-    console.log(result)
+// Run Job every 30minutes 
+cron.schedule('*/30 * * * *', () => {
+    Note.find({}, function(err, result) {
+        var currentData = [];
+        if (err) {
+            console.log(err);
+        } else {
+            currentData.push(...result);
+        }
+        const filteredResult = currentData.filter(a => a.date == moment(new Date()).format("YYYY-MM-DD"))
+
+        for(let x of filteredResult) {
+            mongooseConnect.collection('upcomings').insertOne(x)
+        }
+      });
 })
 
 const server = new GraphQLServer({ typeDefs, resolvers })
