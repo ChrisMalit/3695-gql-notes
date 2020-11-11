@@ -2,8 +2,8 @@
 
 ### Christian, Reza & Jas
 
-# Cloudinary.config
+#### Cloudinary.config
 Must be filled out with Cloudinary Credentials
 
-# Images
+#### Images
 Image upload sources must be placed inside /images folder
