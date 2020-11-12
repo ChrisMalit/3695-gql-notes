@@ -120,8 +120,8 @@ const resolvers = {
     }
 }
 
-// Run Job every 30minutes 
-cron.schedule('*/30 * * * *', () => {
+// Run Job once everyday 
+cron.schedule('0 0 * * *', () => {
     Note.find({}, function(err, result) {
         var currentData = [];
         if (err) {
