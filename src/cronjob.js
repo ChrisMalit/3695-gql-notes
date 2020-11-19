@@ -1,8 +1,17 @@
 const cron = require('node-cron');
 const moment = require('moment');
+const { Note, Upcoming } = require('./database')
+const mongoose = require('mongoose');
+
+mongoose.connect('mongodb+srv://admin:P@ssw0rd@cluster0.zo5ak.mongodb.net/<dbname>?retryWrites=true&w=majority', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+var mongooseConnect = mongoose.connection;
 
 // Run Job every 30minutes 
-cron.schedule('*/30 * * * *', () => {
+cron.schedule('* * * * *', () => {
     Note.find({}, function(err, result) {
         var currentData = [];
         if (err) {
@@ -11,7 +20,6 @@ cron.schedule('*/30 * * * *', () => {
             currentData.push(...result);
         }
         const filteredResult = currentData.filter(a => a.date == moment(new Date()).format("YYYY-MM-DD"))
-
         for(let x of filteredResult) {
             mongooseConnect.collection('upcomings').insertOne(x)
         }
