@@ -11,7 +11,7 @@ mongoose.connect('mongodb+srv://admin:P@ssw0rd@cluster0.zo5ak.mongodb.net/<dbnam
 var mongooseConnect = mongoose.connection;
 
 // Run Job every 30minutes 
-cron.schedule('* * * * *', () => {
+cron.schedule('*/30 * * * *', () => {
     Note.find({}, function(err, result) {
         var currentData = [];
         if (err) {
